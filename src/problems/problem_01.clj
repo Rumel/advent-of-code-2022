@@ -1,5 +1,7 @@
 (ns problems.problem-01
-  "Day 1: Calorie Counting"
+  "Day 1: Calorie Counting
+   
+   Problem: https://adventofcode.com/2022/day/1"
   (:require [clojure.string :as str]))
 
 (defn get-calorie-totals
