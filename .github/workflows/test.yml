@@ -15,4 +15,4 @@ jobs:
         uses: DeLaGuardo/setup-clojure@10.1
         with:
           cli: 'latest'              # Clojure CLI based on tools.deps
-      - run: clj -A:test 
+      - run: clojure -A:test 
