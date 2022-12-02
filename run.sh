@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
 
-clj -M -m "main" $@
+clojure -M -m "main" $@

@@ -2,8 +2,8 @@
 
 if [ -z "$1" ]
 then
-  clj -A:test
+  clojure -A:test
 else
   problem=`printf %02d $1`
-  clj -A:test -n "problems.problem-$problem-test"
+  clojure -A:test -n "problems.problem-$problem-test"
 fi
