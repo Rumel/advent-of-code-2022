@@ -1,6 +1,13 @@
 (ns problems.problem-01-test
   (:require [clojure.test :as test :refer [deftest is]]
-            [problems.problem-01 :refer [answer-a answer-b get-calorie-totals max-calories convert-to-vec top-three-calories]]))
+            [problems.problem-01
+             :refer
+             [answer-a
+              answer-b
+              get-calorie-totals
+              max-calories
+              s->seq
+              top-three-calories]]))
 
 (deftest get-calorie-totals-test
   (is (= [6000 4000 11000 24000 10000]
@@ -13,8 +20,8 @@
   (is (= [24000 11000 10000]
          (top-three-calories [6000 4000 11000 24000 10000]))))
 
-(deftest convert-to-vec-test
-  (is (= [[1 2 3] [4 5]] (convert-to-vec "1\n2\n3\n\n4\n5\n"))))
+(deftest s->seq-test
+  (is (= [[1 2 3] [4 5]] (s->seq "1\n2\n3\n\n4\n5\n"))))
 
 (deftest answer-a-test
   (is (= (answer-a "data/problem-01-a.txt") 24000)))

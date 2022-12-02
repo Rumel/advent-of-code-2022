@@ -14,18 +14,21 @@
   [calories]
   (apply max calories))
 
-(defn convert-to-vec
-  "Take a string and convert it to a vector of vector of numbers."
+(defn str->int
+  "Convert string to num or return nil if empty"
   [s]
-  (let [lines (str/split-lines s)]
-    (loop [lines lines
-           ret-arr []
-           cur-arr []]
-      (if (empty? lines)
-        (conj ret-arr cur-arr)
-        (if (empty? (first lines))
-          (recur (rest lines) (conj ret-arr cur-arr) [])
-          (recur (rest lines) ret-arr (conj cur-arr (read-string (first lines)))))))))
+  (if (empty? s)
+    nil
+    (read-string s)))
+
+(defn s->seq
+  "Convert string to sequence"
+  [s]
+  (let [split (str/split s #"\n")]
+    (->> split
+         (map str->int)
+         (partition-by nil?)
+         (take-nth 2))))
 
 (defn top-three-calories
   "Return a vector of the top 3 calorie counts"
@@ -37,7 +40,7 @@
   [file]
   (-> file
       slurp
-      convert-to-vec
+      s->seq
       get-calorie-totals
       max-calories))
 
@@ -46,7 +49,7 @@
   [file]
   (-> file
       slurp
-      convert-to-vec
+      s->seq
       get-calorie-totals
       top-three-calories
       (as-> calories (reduce + calories))))
