@@ -4,6 +4,7 @@
              [answer-a
               answer-b
               char-value
+              common-item
               duplicate-char]]))
 
 (deftest duplicate-char-test
@@ -20,8 +21,12 @@
   (is (= 27 (char-value \A)))
   (is (= 52 (char-value \Z))))
 
+(deftest common-item-test
+  (is (= \r (common-item ["vJrwpWtwJgWrhcsFMMfFFhFp" "jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL" "PmmdzqPrVvPwwTWBwg"])))
+  (is (= \Z (common-item ["wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn" "ttgJtRGJQctTZtZT" "CrZsJsPPZsGzwwsLwLmpwMDw"]))))
+
 (deftest answer-a-test
   (is (=  157 (answer-a "data/problem-03-a.txt"))))
 
 (deftest answer-b-test
-  (is (=  "Not implemented yet" (answer-b "data/problem-03-a.txt"))))
+  (is (=  70 (answer-b "data/problem-03-a.txt"))))
