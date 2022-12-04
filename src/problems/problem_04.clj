@@ -15,6 +15,14 @@
   (or (and (>= a c) (<= b d))
       (and (>= c a) (<= d b))))
 
+(defn overlap? [[[a b] [c d]]]
+  (cond
+    (and (>= a c) (<= a d)) true
+    (and (>= b c) (<= b d)) true
+    (and (>= c a) (<= c b)) true
+    (and (>= d a) (<= d b)) true
+    :else false))
+
 (defn answer-a [file]
   (->> file
        lines
@@ -23,7 +31,13 @@
        (filter true?)
        count))
 
-(defn answer-b [file] "Not implemented yet")
+(defn answer-b [file]
+  (->> file
+       lines
+       (map #(convert %))
+       (map #(overlap? %))
+       (filter true?)
+       count))
 
 (defn answer []
   (println "04: A:" (answer-a "data/problem-04-input.txt"))

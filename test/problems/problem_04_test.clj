@@ -4,11 +4,16 @@
              [answer-a
               answer-b
               contained?
-              convert]]))
+              convert
+              overlap?]]))
 
 (deftest contained?-test
   (is (= false (contained? [[2 4] [6 8]])))
   (is (= true (contained? [[6 6] [4 6]]))))
+
+(deftest overlap?-test
+  (is (= false (overlap? [[2 4] [6 8]])))
+  (is (= true (overlap? [[6 6] [4 6]]))))
 
 (deftest convert-test
   (is (= [[2 4] [6 8]] (convert "2-4,6-8")))
@@ -19,4 +24,4 @@
   (is (= 2 (answer-a "data/problem-04-a.txt"))))
 
 (deftest answer-b-test
-  (is (= "Not implemented yet" (answer-b "data/problem-04-a.txt"))))
+  (is (= 4 (answer-b "data/problem-04-a.txt"))))
