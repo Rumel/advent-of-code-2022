@@ -48,7 +48,7 @@
         crates'' (assoc crates' (dec to) new-stack)]
     crates''))
 
-(defn execute-instruction [crates instruction]
+(defn execute-instruction-a [crates instruction]
   (let [[times from to] instruction]
     (loop [i times
            crates crates]
@@ -56,15 +56,30 @@
         crates
         (recur (dec i) (move-crate crates from to))))))
 
+(defn execute-instruction-b [crates instruction]
+  (let [[times from to] instruction
+        items (take-last times (crates (dec from)))
+        old-stack (drop-last times (crates (dec from)))
+        new-stack (concat (crates (dec to)) items)
+        crates' (assoc crates (dec from) old-stack)
+        crates'' (assoc crates' (dec to) new-stack)]
+    crates''))
+
 (defn answer-a [file]
   (let [[crates instructions] (->> file
                                    input
                                    parse-input)]
-    (->> (reduce execute-instruction crates instructions)
+    (->> (reduce execute-instruction-a crates instructions)
          (map #(peek %))
          (str/join))))
 
-(defn answer-b [file] "Not implemented yet")
+(defn answer-b [file]
+  (let [[crates instructions] (->> file
+                                   input
+                                   parse-input)]
+    (->> (reduce execute-instruction-b crates instructions)
+         (map #(last %))
+         (str/join))))
 
 (defn answer []
   (println "05: A:" (answer-a "data/problem-05-input.txt"))

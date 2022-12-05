@@ -3,7 +3,7 @@
             [problems.problem-05 :refer
              [answer-a
               answer-b
-              execute-instruction
+              execute-instruction-a
               matcher
               move-crate]]))
 
@@ -15,12 +15,12 @@
   (is (= [[1] [3 2] []] (move-crate [[1 2] [3] []] 1 2)))
   (is (= [[1] [3 4 2] []] (move-crate [[1 2] [3 4] []] 1 2))))
 
-(deftest execute-instruction-test
-  (is (= [[1] [3 2] []] (execute-instruction [[1 2] [3] []] [1 1 2])))
-  (is (= [[] [3 2 1] []] (execute-instruction [[1 2] [3] []] [2 1 2]))))
+(deftest execute-instruction-a-test
+  (is (= [[1] [3 2] []] (execute-instruction-a [[1 2] [3] []] [1 1 2])))
+  (is (= [[] [3 2 1] []] (execute-instruction-a [[1 2] [3] []] [2 1 2]))))
 
 (deftest answer-a-test
   (is (= "CMZ" (answer-a "data/problem-05-a.txt"))))
 
 (deftest answer-b-test
-  (is (= "Not implemented yet" (answer-b "data/problem-05-a.txt"))))
+  (is (= "MCD" (answer-b "data/problem-05-a.txt"))))
