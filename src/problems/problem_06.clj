@@ -1,6 +1,5 @@
 (ns problems.problem-06
-  (:require [common.helpers :refer [input]]
-            [clojure.string :as str]))
+  (:require [common.helpers :refer [input]]))
 
 (defn packet-index [n s]
   ((reduce (fn [{:keys [index result] :as d} value]
