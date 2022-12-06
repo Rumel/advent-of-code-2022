@@ -3,7 +3,13 @@
             [problems.problem-05 :refer
              [answer-a
               answer-b
-              matcher]]))
+              matcher
+              update-crates]]))
+
+(deftest update-crates-test
+  (is (= [[\A] [\M] []] (update-crates [[] [] []] [\A \M \space])))
+  (is (= [[] [] []] (update-crates [[] [] []] [\space \space \space])))
+  (is (= [[\A \A] [\Z \M] [\D]] (update-crates [[\A] [\Z] []] [\A \M \D]))))
 
 (deftest matcher-test
   (is (= ["move 1 from 2 to 1" "1" "2" "1"] (re-matches matcher "move 1 from 2 to 1")))
