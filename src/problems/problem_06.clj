@@ -3,16 +3,15 @@
             [clojure.string :as str]))
 
 (defn packet-index [n s]
-  (let [partitions (partition n 1 (str/split s #""))]
-    ((reduce (fn [{:keys [index result] :as d} value]
-               (if (not= result nil)
-                 d
-                 (if (= n (count (set value)))
-                   (assoc d :result index)
-                   (assoc d :index (inc index)))))
-             {:index n :result nil}
-             partitions)
-     :result)))
+  ((reduce (fn [{:keys [index result] :as d} value]
+             (if (not= result nil)
+               d
+               (if (= n (count (set value)))
+                 (assoc d :result index)
+                 (assoc d :index (inc index)))))
+           {:index n :result nil}
+           (partition n 1 s))
+   :result))
 
 (defn answer-a [file]
   (->> file
