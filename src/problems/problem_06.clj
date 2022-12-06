@@ -2,15 +2,12 @@
   (:require [common.helpers :refer [input]]))
 
 (defn packet-index [n s]
-  ((reduce (fn [{:keys [index result] :as d} value]
-             (if (not= result nil)
-               d
-               (if (= n (count (set value)))
-                 (assoc d :result index)
-                 (assoc d :index (inc index)))))
-           {:index n :result nil}
-           (partition n 1 s))
-   :result))
+  (reduce (fn [index value]
+            (if (= n (count (set value)))
+              (reduced index)
+              (inc index)))
+          n
+          (partition n 1 s)))
 
 (defn answer-a [file]
   (->> file
