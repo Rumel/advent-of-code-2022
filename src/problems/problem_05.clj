@@ -5,16 +5,10 @@
 (def matcher #"move (\d+) from (\d+) to (\d+)")
 
 (defn update-crates [crates values]
-  (loop [ret-crates []
-         fc (first crates)
-         rc (rest crates)
-         fv (first values)
-         rv (rest values)]
-    (if (nil? fc)
-      ret-crates
-      (if (not (= \space fv))
-        (recur (conj ret-crates (conj fc fv)) (first rc) (rest rc) (first rv) (rest rv))
-        (recur (conj ret-crates fc) (first rc) (rest rc) (first rv) (rest rv))))))
+  (reduce (fn [crates [stack value]]
+            (if (= value \space)
+              (conj crates stack)
+              (conj crates (conj stack value)))) [] (map vector crates values)))
 
 (defn input->crates [input]
   (let [reversed (reverse input)
