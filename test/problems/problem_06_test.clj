@@ -3,12 +3,7 @@
             [problems.problem-06 :refer
              [answer-a
               answer-b
-              get-arr
               packet-index]]))
-
-(deftest get-arr-test
-  (is (= [1 2 3 4] (get-arr [1 2 3] 4 4)))
-  (is (= [2 3 4 5] (get-arr [1 2 3 4] 5 4))))
 
 (deftest packet-index-test
   (is (= 7 (packet-index 4 "mjqjpqmgbljsphdztnvjfqwrcgsmlb")))
@@ -23,7 +18,9 @@
   (is (= 26 (packet-index 14 "zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw"))))
 
 (deftest answer-a-test
-  (is (=  7 (answer-a "data/problem-06-a.txt"))))
+  (is (= 7 (answer-a "data/problem-06-a.txt")))
+  (is (= 1093 (answer-a "data/problem-06-input.txt"))))
 
 (deftest answer-b-test
-  (is (= 19 (answer-b "data/problem-06-a.txt"))))
+  (is (= 19 (answer-b "data/problem-06-a.txt")))
+  (is (= 3534 (answer-b "data/problem-06-input.txt"))))
