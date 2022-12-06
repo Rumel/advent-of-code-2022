@@ -23,12 +23,9 @@
         crate-count (count (first parsed))
         crates (take crate-count (cycle [[]]))
         current-stack (drop 1 parsed)]
-    (loop [crates crates
-           f (first current-stack)
-           r (rest current-stack)]
-      (if (nil? f)
-        crates
-        (recur (update-crates crates f) (first r) (rest r))))))
+    (reduce (fn [crates stack]
+              (update-crates crates stack))
+            crates current-stack)))
 
 (defn input->instructions [input]
   (map (fn [s]
@@ -40,44 +37,34 @@
         instructions (input->instructions (rest (drop-while not-empty input)))]
     [crates instructions]))
 
-(defn move-crate [crates from to]
-  (let [crate (peek (crates (dec from)))
-        old-stack (pop (crates (dec from)))
-        new-stack (conj (crates (dec to)) crate)
-        crates' (assoc crates (dec from) old-stack)
-        crates'' (assoc crates' (dec to) new-stack)]
-    crates''))
-
-(defn execute-instruction-a [crates instruction]
-  (let [[times from to] instruction]
-    (loop [i times
-           crates crates]
-      (if (= i 0)
-        crates
-        (recur (dec i) (move-crate crates from to))))))
-
-(defn execute-instruction-b [crates instruction]
-  (let [[times from to] instruction
-        items (take-last times (crates (dec from)))
-        old-stack (drop-last times (crates (dec from)))
-        new-stack (concat (crates (dec to)) items)
-        crates' (assoc crates (dec from) old-stack)
-        crates'' (assoc crates' (dec to) new-stack)]
-    crates''))
+(defn execute-instruction
+  [rev]
+  (fn
+    [crates instruction]
+    (let [[times from to] instruction
+          items (take-last times (crates (dec from)))
+          items (if rev (reverse items) items)
+          old-stack (drop-last times (crates (dec from)))
+          new-stack (concat (crates (dec to)) items)]
+      (reduce (fn [crates [index stack]]
+                (if reverse
+                  (assoc crates (dec index) stack)
+                  (assoc crates (dec index) stack)))
+              crates [[from old-stack] [to new-stack]]))))
 
 (defn answer-a [file]
   (let [[crates instructions] (->> file
                                    input
                                    parse-input)]
-    (->> (reduce execute-instruction-a crates instructions)
-         (map #(peek %))
+    (->> (reduce (execute-instruction true) crates instructions)
+         (map #(last %))
          (str/join))))
 
 (defn answer-b [file]
   (let [[crates instructions] (->> file
                                    input
                                    parse-input)]
-    (->> (reduce execute-instruction-b crates instructions)
+    (->> (reduce (execute-instruction false) crates instructions)
          (map #(last %))
          (str/join))))
 
