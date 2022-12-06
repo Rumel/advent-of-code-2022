@@ -17,7 +17,10 @@
                  (let [arr (get-arr arr (first value) n)]
                    (if (= n (count (set arr)))
                      (assoc d :result (second value))
-                     (assoc d :arr arr))))) {:arr (vec (map first (take (dec n) combined))) :result nil} (drop (dec n) combined)) :result)))
+                     (assoc d :arr arr)))))
+             {:arr (vec (map first (take (dec n) combined))) :result nil}
+             (drop (dec n) combined))
+     :result)))
 
 (defn answer-a [file]
   (->> file
