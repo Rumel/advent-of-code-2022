@@ -57,4 +57,5 @@
   (is (= 1644735 (answer-a "data/problem-07-input.txt"))))
 
 (deftest answer-b-test
-  (is (= "Not implemented yet" (answer-b "data/problem-07-a.txt"))))
+  (is (= 24933642 (answer-b "data/problem-07-a.txt")))
+  (is (= 1300850 (answer-b "data/problem-07-input.txt"))))

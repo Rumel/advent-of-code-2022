@@ -1,10 +1,9 @@
 (ns problems.problem-07
-  (:require [clojure.pprint :as pprint]
-            [clojure.string :as str]
-            [common.helpers :refer [input]]))
+  (:require
+   [clojure.string :as str]
+   [common.helpers :refer [input]]))
 
 (def base-map {:cwd "" :dirs {}})
-
 
 (def cd-regex #"\$ cd (.+)")
 (defn matches-cd [line] (not (nil? (re-matches cd-regex line))))
@@ -79,7 +78,23 @@
            (filter #(<= % 100000))
            (reduce + 0))))
 
-(defn answer-b [file] "Not implemented yet")
+(defn answer-b [file]
+  (let [dirs-vec (-> file
+                     input
+                     create-directory-structure
+                     :dirs
+                     vec)
+        dir-sizes (->> dirs-vec
+                       (map directory-file-sizes)
+                       (map second)
+                       sort
+                       reverse)
+        unused-space (- 70000000 (first dir-sizes))
+        needed-space (- 30000000 unused-space)]
+    (->> dir-sizes
+         reverse
+         (drop-while #(< % needed-space))
+         first)))
 
 (defn answer []
   (println "07: A:" (answer-a "data/problem-07-input.txt"))
