@@ -30,20 +30,18 @@
 (defn is-vible-side [item side]
   (if (empty? side)
     true
-    (every? #(>= item %) side)))
+    (every? #(> item %) side)))
 
 (defn is-visible [arr x y]
-  (let [item (aget arr y x)]
-    (if (= item 0)
-      false
-      (let [left (get-left arr x y)
-            right (get-right arr x y)
-            up (get-up arr x y)
-            down (get-down arr x y)]
-        (or (is-vible-side item left)
-            (is-vible-side item right)
-            (is-vible-side item up)
-            (is-vible-side item down))))))
+  (let [item (aget arr y x)
+        left (get-left arr x y)
+        right (get-right arr x y)
+        up (get-up arr x y)
+        down (get-down arr x y)]
+    (or (is-vible-side item left)
+        (is-vible-side item right)
+        (is-vible-side item up)
+        (is-vible-side item down))))
 
 (defn visible-count [arr]
   (let [size (count arr)]
