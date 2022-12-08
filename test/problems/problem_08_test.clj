@@ -7,7 +7,9 @@
               get-down
               get-left
               get-right
-              get-up]]))
+              get-up
+              visible-score
+              visible-trees]]))
 
 (def test-array
   (to-array-2d
@@ -30,9 +32,30 @@
   (is (= [3 5] (get-up test-array 2 2)))
   (is (= [] (get-up test-array 0 0))))
 
+(deftest visible-trees-test
+  (is (= 1 (visible-trees [3])))
+  (is (= 1 (visible-trees [5 2])))
+  (is (= 2 (visible-trees [1 2])))
+  (is (= 2 (visible-trees [3 5 3])))
+
+  (is (= 2 (visible-trees [3 5 3])))
+  (is (= 2 (visible-trees [3 3])))
+  (is (= 1 (visible-trees [3])))
+  (is (= 2 (visible-trees [4 9])))
+
+  (is (= 3 (visible-trees [3 5 6])))
+  (is (= 2 (visible-trees [1 7])))
+  (is (= 1 (visible-trees [2])))
+  (is (= 2 (visible-trees [4 9]))))
+
+(deftest visible-score-test
+  (is (= 4 (visible-score test-array 2 1)))
+  (is (= 8 (visible-score test-array 2 3)))
+  (is (= 12 (visible-score test-array 3 2))))
+
 (deftest answer-a-test
   (is (= 21 (answer-a "data/problem-08-a.txt")))
   (is (= 1672 (answer-a "data/problem-08-input.txt"))))
 
 (deftest answer-b-test
-  (is (= "Not implemented yet" (answer-b "data/problem-08-a.txt"))))
+  (is (= 8 (answer-b "data/problem-08-a.txt"))))

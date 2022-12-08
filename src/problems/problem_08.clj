@@ -1,5 +1,5 @@
 (ns problems.problem-08
-  (:require [common.helpers :refer [input]]
+  (:require [common.helpers :refer [input debug]]
             [clojure.string :as str]))
 
 (defn parse-line [line]
@@ -51,6 +51,33 @@
         1
         0))))
 
+(defn visible-trees [coll]
+  (->> coll
+       (reduce (fn [{:keys [v l] :as d} t]
+                 (cond
+                   (nil? l) {:v (inc v) :l t}
+                   (<= l t) {:v (inc v) :l t}
+                   :else (reduced d)))
+               {:v 0 :l nil})
+       :v))
+
+(defn visible-score [arr x y]
+  (let [left (reverse (get-left arr x y))
+        right (get-right arr x y)
+        up (reverse (get-up arr x y))
+        down (get-down arr x y)]
+    (* (visible-trees left)
+       (visible-trees right)
+       (visible-trees down)
+       (visible-trees up))))
+
+(defn highest-view
+  [arr]
+  (let [size (count arr)]
+    (for [y (range 0 size)
+          x (range 0 size)]
+      (visible-score arr x y))))
+
 (defn parsed-input [file]
   (->> file
        input
@@ -63,8 +90,17 @@
        visible-count
        (reduce + 0)))
 
-(defn answer-b [file] "Not implemented yet")
+(defn answer-b [file]
+  (->> file
+       parsed-input
+       to-array-2d
+       highest-view
+       ((fn [arr]
+          (debug (to-array-2d (partition 5 arr)))
+          arr))
+       (apply max)))
 
+;; 378 is too low
 (defn answer []
   (println "08: A:" (answer-a "data/problem-08-input.txt"))
   (println "08: B:" (answer-b "data/problem-08-input.txt")))
