@@ -1,5 +1,5 @@
 (ns problems.problem-08
-  (:require [common.helpers :refer [input debug]]
+  (:require [common.helpers :refer [input]]
             [clojure.string :as str]))
 
 (defn parse-line [line]
@@ -51,25 +51,30 @@
         1
         0))))
 
-(defn visible-trees [coll]
+(defn visible-trees [item coll]
   (->> coll
        (reduce (fn [{:keys [v l] :as d} t]
                  (cond
                    (nil? l) {:v (inc v) :l t}
-                   (<= l t) {:v (inc v) :l t}
+                   (and (<= l t)
+                        (>= item t)) {:v (inc v) :l t}
+                   (and (<= l t)
+                        (< item t)
+                        (>= item l)) (reduced {:v (inc v) :l t})
                    :else (reduced d)))
                {:v 0 :l nil})
        :v))
 
 (defn visible-score [arr x y]
-  (let [left (reverse (get-left arr x y))
+  (let [item (aget arr y x)
+        left (reverse (get-left arr x y))
         right (get-right arr x y)
         up (reverse (get-up arr x y))
         down (get-down arr x y)]
-    (* (visible-trees left)
-       (visible-trees right)
-       (visible-trees down)
-       (visible-trees up))))
+    (* (visible-trees item left)
+       (visible-trees item right)
+       (visible-trees item down)
+       (visible-trees item up))))
 
 (defn highest-view
   [arr]
@@ -95,9 +100,6 @@
        parsed-input
        to-array-2d
        highest-view
-       ((fn [arr]
-          (debug (to-array-2d (partition 5 arr)))
-          arr))
        (apply max)))
 
 ;; 378 is too low
