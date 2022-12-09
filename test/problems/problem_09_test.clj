@@ -7,15 +7,18 @@
               move-direction
               point]]))
 
-(def move-direction-starting {:head (point 1 1) :head-visited #{(point 1 1)}})
+(def move-direction-starting {:knots [(point 1 1)]})
 (deftest move-direction-test
-  (is (= (point 2 1) ((move-direction move-direction-starting "R") :head)))
-  (is (= (point 0 1) ((move-direction move-direction-starting "L") :head)))
-  (is (= (point 1 2) ((move-direction move-direction-starting "U") :head)))
-  (is (= (point 1 0) ((move-direction move-direction-starting "D") :head))))
+  (is (= (point 2 1) (first ((move-direction move-direction-starting "R") :knots))))
+  (is (= (point 0 1) (first ((move-direction move-direction-starting "L") :knots))))
+  (is (= (point 1 2) (first ((move-direction move-direction-starting "U") :knots))))
+  (is (= (point 1 0) (first ((move-direction move-direction-starting "D") :knots)))))
 
 (deftest answer-a-test
-  (is (= 13 (answer-a "data/problem-09-a.txt"))))
+  (is (= 13 (answer-a "data/problem-09-a.txt")))
+  (is (= 5878 (answer-a "data/problem-09-input.txt"))))
 
 (deftest answer-b-test
-  (is (= (answer-b "Not implemented yet"))))
+  (is (= 1 (answer-b "data/problem-09-a.txt")))
+  (is (= 36 (answer-b "data/problem-09-b.txt")))
+  (is (= 2405 (answer-b "data/problem-09-input.txt"))))

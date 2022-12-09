@@ -16,14 +16,15 @@
 
 (defn move-direction
   "Move the head one space in the direction"
-  [{:keys [head head-visited] :as d} direction]
-  (let [new-head (case direction
+  [{:keys [knots] :as d} direction]
+  (let [head (first knots)
+        r (rest knots)
+        new-head (case direction
                    "R" (point (inc (head :x)) (head :y))
                    "L" (point (dec (head :x)) (head :y))
                    "U" (point (head :x) (inc (head :y)))
-                   "D" (point (head :x) (dec (head :y))))
-        new-head-visited (conj head-visited new-head)]
-    (assoc d :head new-head :head-visited new-head-visited)))
+                   "D" (point (head :x) (dec (head :y))))]
+    (assoc d :knots (conj r new-head))))
 
 (defn get-tail-position
   [diff {:keys [x y] :as current-tail}]
@@ -40,63 +41,64 @@
     (= diff (point -1 2)) (point (dec x) (inc y))
     (= diff (point -2 -1)) (point (dec x) (dec y))
     (= diff (point -1 -2)) (point (dec x) (dec y))
+    (= diff (point -2 -2)) (point (dec x) (dec y))
+    (= diff (point 2 2)) (point (inc x) (inc y))
+    (= diff (point -2 2)) (point (dec x) (inc y))
+    (= diff (point 2 -2)) (point (inc x) (dec y))
     :else current-tail))
 
 
-(defn move-tail
+(defn move-knot
   "Move the tail if necessary"
-  [{:keys [head tail tail-visited] :as d}]
-  (let [diff-x (- (head :x) (tail :x))
-        diff-y (- (head :y) (tail :y))
-        diff (point diff-x diff-y)]
-    (if (or (= (abs diff-x) 2) (= (abs diff-y) 2))
-      (let [new-tail-position (get-tail-position diff tail)]
-        (assoc d :tail new-tail-position :tail-visited (conj tail-visited new-tail-position)))
-      d)))
+  [acc p]
+  (if (empty? acc)
+    (conj acc p)
+    (let [prev (last acc)
+          diff-x (- (prev :x) (p :x))
+          diff-y (- (prev :y) (p :y))
+          diff (point diff-x diff-y)]
+      (conj acc (get-tail-position diff p)))))
 
-(defn debug-instruction
-  [{:keys [head tail] :as d}]
-  (let [row (vec (take 6 (cycle "-")))
-        board (map (fn [x] row) (range 0 6))
-        board (into [] board)
-        board (assoc-in board [(- 5 (head :y)) (head :x)] "H")
-        board (assoc-in board [(- 5 (tail :y)) (tail :x)] "T")
-        board (str/join "\n" (map #(str/join " " %) board))]
-    (println "New Board")
-    (println board)
-    (println ""))
-  d)
+(defn move-knots
+  [{:keys [knots :tail-visited] :as d}]
+  (let [knots (reduce move-knot [] knots)
+        tail (last knots)
+        tail-visited (conj tail-visited tail)]
+    (assoc d :knots knots :tail-visited tail-visited)))
 
 (defn process-instruction
-  [{:keys [visited head tail] :as d} {:keys [direction num] :as instruction}]
+  [d {:keys [direction num]}]
   (if (= num 0)
     d
     (-> d
         (move-direction direction)
-        move-tail
-        ;; (debug-instruction)
+        move-knots
         (process-instruction {:direction direction :num (dec num)}))))
 
 (defn simulate
   "Simulate all the instructions"
-  [instructions]
+  [knots instructions]
   (let [base (point 0 0)]
     (reduce
      process-instruction
-     {:tail-visited #{base} :head-visited #{base} :head base :tail base}
+     {:tail-visited #{base} :knots (take (inc knots) (cycle [base]))}
      instructions)))
 
 (defn answer-a [file]
   (->> file
        input
        parsed-input
-       simulate
+       (simulate 1)
        :tail-visited
        count))
 
-(answer-a "data/problem-09-a.txt")
-
-(defn answer-b [file] "Not implemented yet")
+(defn answer-b [file]
+  (->> file
+       input
+       parsed-input
+       (simulate 9)
+       :tail-visited
+       count))
 
 (defn answer []
   (println "09: A:" (answer-a "data/problem-09-input.txt"))
