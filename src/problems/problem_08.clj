@@ -5,27 +5,31 @@
 (defn parse-line [line]
   (map read-string (str/split line #"")))
 
+
 (defn get-left [arr x y]
-  (if (= x 0)
-    []
-    (map #(aget arr y %) (range 0 x))))
+  (lazy-seq
+   (if (= x 0) nil
+       (cons (aget arr y (dec x)) (get-left arr (dec x) y)))))
 
 (defn get-right [arr x y]
   (let [size (count (aget arr 0))]
-    (if (= x (dec size))
-      []
-      (map #(aget arr y %) (range (inc x) size)))))
+    (lazy-seq
+     (if (= x (dec size))
+       nil
+       (cons (aget arr y (inc x)) (get-right arr (inc x) y))))))
 
 (defn get-up [arr x y]
-  (if (= y 0)
-    []
-    (map #(aget arr % x) (range 0 y))))
+  (lazy-seq
+   (if (= y 0)
+     nil
+     (cons (aget arr (dec y) x) (get-up arr x (dec y))))))
 
 (defn get-down [arr x y]
   (let [size (count arr)]
-    (if (= y (dec size))
-      []
-      (map #(aget arr % x) (range (inc y) size)))))
+    (lazy-seq
+     (if (= y (dec size))
+       nil
+       (cons (aget arr (inc y) x) (get-down arr x (inc y)))))))
 
 (defn is-vible-side [item side]
   (if (empty? side)
@@ -61,9 +65,9 @@
 
 (defn visible-score [arr x y]
   (let [item (aget arr y x)
-        left (reverse (get-left arr x y))
+        left (get-left arr x y)
         right (get-right arr x y)
-        up (reverse (get-up arr x y))
+        up (get-up arr x y)
         down (get-down arr x y)]
     (* (visible-trees item left)
        (visible-trees item right)
@@ -97,5 +101,23 @@
        (apply max)))
 
 (defn answer []
-  (println "08: A:" (answer-a "data/problem-08-input.txt"))
-  (println "08: B:" (answer-b "data/problem-08-input.txt")))
+  ;; Before lazy-seq
+  ;; "Elapsed time: 3390.96475 msecs"
+  ;; "Elapsed time: 4337.584125 msecs"
+  ;; "Elapsed time: 4420.380708 msecs"
+  ;; After lazy-seq
+  ;; "Elapsed time: 850.893625 msecs"
+  ;; "Elapsed time: 651.673083 msecs"
+  ;; "Elapsed time: 716.397167 msecs"
+  ;; 5.4x improvement
+  (time (println "08: A:" (answer-a "data/problem-08-input.txt")))
+  ;; Before lazy-seq
+  ;; "Elapsed time: 4492.429333 msecs"
+  ;; "Elapsed time: 6271.296375 msecs"
+  ;; "Elapsed time: 6375.044709 msecs"
+  ;; After lazy-seq
+  ;; "Elapsed time: 702.930834 msecs"
+  ;; "Elapsed time: 574.393375 msecs"
+  ;; "Elapsed time: 696.346834 msecs"
+  ;; 8.6x improvement
+  (time (println "08: B:" (answer-b "data/problem-08-input.txt"))))

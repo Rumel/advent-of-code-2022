@@ -20,16 +20,16 @@
     [3, 5, 3, 9, 0]]))
 
 (deftest get-left-test
-  (is (= [6 5] (get-left test-array 2 2)))
+  (is (= [5 6] (get-left test-array 2 2)))
   (is (= [] (get-left test-array 0 0))))
 (deftest get-right-test
   (is (= [3 2] (get-right test-array 2 2)))
-  (is (= [] (get-right test-array 5 0))))
+  (is (= [] (get-right test-array 4 0))))
 (deftest get-down-test
   (is (= [5 3] (get-down test-array 2 2)))
-  (is (= [] (get-down test-array 0 5))))
+  (is (= [] (get-down test-array 0 4))))
 (deftest get-up-test
-  (is (= [3 5] (get-up test-array 2 2)))
+  (is (= [5 3] (get-up test-array 2 2)))
   (is (= [] (get-up test-array 0 0))))
 
 (deftest visible-trees-test
