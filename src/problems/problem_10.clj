@@ -1,5 +1,6 @@
 (ns problems.problem-10
-  (:require [common.helpers :refer [input]]))
+  (:require [clojure.string :as str]
+            [common.helpers :refer [input]]))
 
 (defn parse-line [line]
   (let [noop-match (re-matches #"noop" line)
@@ -14,13 +15,22 @@
        input
        (map parse-line)))
 
+(defn get-pixel [cycle register]
+  (let [index (mod (dec cycle) 40)]
+    (println "Cycle: " cycle " Mod: " index " Register: " register)
+    (if (nil? (#{(dec register) register (inc register)} index))
+      "."
+      "#")))
+
 (defn cycle-cpu [d]
-  (let [cycle (d :cycle)]
+  (let [cycle (d :cycle)
+        print-out (d :print-out)
+        register-x (d :register-x)
+        pixel (get-pixel cycle register-x)]
     (if (not (nil? (#{20 60 100 140 180 220} cycle)))
-      (let [results (d :results)
-            register-x (d :register-x)]
-        (assoc d :cycle (inc cycle) :results (conj results (* register-x cycle))))
-      (assoc d :cycle (inc cycle)))))
+      (let [results (d :results)]
+        (assoc d :cycle (inc cycle) :results (conj results (* register-x cycle)) :print-out (conj print-out pixel)))
+      (assoc d :cycle (inc cycle) :print-out (conj print-out pixel)))))
 
 (defn addx [acc n]
   (-> acc
@@ -36,8 +46,12 @@
               (= :noop (instruction :instruction)) (cycle-cpu acc)
               (= :addx (instruction :instruction)) (addx acc (instruction :data))
               :else acc))
-          {:cycle 1 :results [] :register-x 1}
+          {:cycle 1 :results [] :register-x 1 :print-out []}
           instructions))
+
+(defn print-result [characters]
+  (let [rows (partition 40 characters)]
+    (str "\n" (str/join "\n" (map #(str/join "" %) rows)))))
 
 (defn answer-a [file]
   (->> file
@@ -46,7 +60,12 @@
        :results
        (apply +)))
 
-(defn answer-b [file] "Not implemented yet")
+(defn answer-b [file]
+  (->> file
+       parsed-input
+       process-instructions
+       :print-out
+       print-result))
 
 (defn answer []
   (println "10: A:" (answer-a "data/problem-10-input.txt"))
