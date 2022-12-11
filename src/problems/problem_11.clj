@@ -2,9 +2,6 @@
   (:require [common.helpers :refer [input]]
             [clojure.string :as str]))
 
-(defn get-num [s]
-  (read-string s))
-
 (defn parse-monkey-index
   [line]
   (-> (re-matches #"Monkey (\d+):" line)
@@ -17,7 +14,7 @@
       (str/split #":")
       (get 1)
       (str/split #",")
-      (->> (map get-num))))
+      (->> (map read-string))))
 
 (defn operation-func
   [[x y z] divide-by-three]
@@ -29,10 +26,10 @@
       (let [result (operator
                     (if (= x "old")
                       old
-                      (get-num x))
+                      (read-string x))
                     (if (= z "old")
                       old
-                      (get-num z)))]
+                      (read-string z)))]
         (if divide-by-three
           (int (/ result 3))
           result)))))
@@ -98,11 +95,8 @@
      transformed-items)))
 
 (defn execute-round
-  [d round-num]
-  ;; (println "Round: " round-num)
+  [d _round]
   (let [result (reduce execute-monkey d (map :index (d :monkeys)))]
-    ;; (println (map (comp vec :items) (result :monkeys)))
-    ;; (println result)
     result))
 
 (defn execute-rounds

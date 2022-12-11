@@ -25,4 +25,5 @@
   (is (= 54253 (answer-a "data/problem-11-input.txt"))))
 
 (deftest answer-b-test
-  (is (= 2713310158 (answer-b "data/problem-11-a.txt"))))
+  (is (= 2713310158 (answer-b "data/problem-11-a.txt")))
+  (is (= 13119526120 (answer-b "data/problem-11-input.txt"))))
