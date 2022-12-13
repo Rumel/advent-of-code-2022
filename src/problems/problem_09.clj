@@ -1,5 +1,5 @@
 (ns problems.problem-09
-  (:require [common.helpers :refer [input debug]]
+  (:require [common.helpers :refer [input]]
             [clojure.string :as str]))
 
 (defn point
