@@ -1,6 +1,6 @@
 (ns problems.problem-12
   (:require [clojure.string :as str]
-            [common.helpers :refer [debug input]]))
+            [common.helpers :refer [input]]))
 
 (defn get-value
   [s]
@@ -56,7 +56,7 @@
        (map (fn [line] (str/split line #"")))
        build-graph))
 
-(defn allowed-edges
+(defn allowed-edges-a
   [points current-height edges]
   (filter
    (fn [edge]
@@ -68,8 +68,20 @@
          true
          false))) edges))
 
+(defn allowed-edges-b
+  [points current-height edges]
+  (filter
+   (fn [edge]
+     (let [p (points edge)
+           visited (p :visited)
+           value (p :value)]
+       (if (and (not visited)
+                (>= value (dec current-height)))
+         true
+         false))) edges))
+
 (defn bfs-
-  [g i]
+  [g i f]
   (let [queue (g :queue)
         points (g :points)]
     (if (empty? queue)
@@ -88,18 +100,18 @@
                     d
                     [:next-queue]
                     concat
-                    (allowed-edges (d :points) point-height point-edges)))))
+                    (f (d :points) point-height point-edges)))))
              {:points points :next-queue []}
              queue)]
-        (bfs- {:points (result :points) :queue (result :next-queue)} (inc i))))))
+        (bfs- {:points (result :points) :queue (result :next-queue)} (inc i) f)))))
 
 (defn bfs
-  [graph]
-  (let [starting-node (ffirst (filter #(true? ((second %) :starting)) graph))
+  [graph f starting-node-value]
+  (let [starting-node (ffirst (filter #(= starting-node-value ((second %) :original-value)) graph))
         g {:queue [starting-node] :points graph}]
-    (bfs- g 0)))
+    (bfs- g 0 f)))
 
-(defn print-ending
+(defn print-ending-a
   [graph]
   (->> graph
        (filter (fn [[_k v]]
@@ -108,16 +120,29 @@
        second
        :steps))
 
+(defn print-ending-b
+  [graph]
+  (->> graph
+       (filter (fn [[_k v]]
+                 (= 0 (v :value))))
+       (map #((second %) :steps))
+       (filter some?)
+       sort
+       first))
+
 (defn answer-a
   [file]
   (-> file
       parse-input
-      bfs
-      print-ending))
+      (bfs allowed-edges-a "S")
+      print-ending-a))
 
 (defn answer-b
   [file]
-  "Not implemented yet")
+  (-> file
+      parse-input
+      (bfs allowed-edges-b "E")
+      (print-ending-b)))
 
 (defn answer []
   (println "12: A:" (answer-a "data/problem-12-input.txt"))

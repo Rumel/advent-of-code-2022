@@ -12,7 +12,9 @@
   (is (= [[4 3] [3 4]] (get-edges 4 4 5 5))))
 
 (deftest answer-a-test
-  (is (= 31 (answer-a "data/problem-12-a.txt"))))
+  (is (= 31 (answer-a "data/problem-12-a.txt")))
+  (is (= 484 (answer-a "data/problem-12-input.txt"))))
 
 (deftest answer-b-test
-  (is (= 0 (answer-b "Not implemented yet"))))
+  (is (= 29 (answer-b "data/problem-12-a.txt")))
+  (is (= 478 (answer-b "data/problem-12-input.txt"))))
