@@ -21,17 +21,13 @@
   (is (= 6 ((update-horizontal-bounds waterfall-graph-with-data 6) :x2))))
 
 (deftest update-vertical-bounds-test
-  (is (= 5 ((update-vertical-bounds waterfall-graph 5) :y1)))
   (is (= 5 ((update-vertical-bounds waterfall-graph 5) :y2)))
-  (is (= 1 ((update-vertical-bounds waterfall-graph-with-data 1) :y1)))
   (is (= 5 ((update-vertical-bounds waterfall-graph-with-data 1) :y2)))
-  (is (= 2 ((update-vertical-bounds waterfall-graph-with-data 3) :y1)))
   (is (= 5 ((update-vertical-bounds waterfall-graph-with-data 3) :y2)))
-  (is (= 2 ((update-vertical-bounds waterfall-graph-with-data 6) :y1)))
   (is (= 6 ((update-vertical-bounds waterfall-graph-with-data 6) :y2))))
 
 (deftest answer-a-test
   (is (= 24 (answer-a "data/problem-14-a.txt"))))
 
 (deftest answer-b-test
-  (is (= (answer-b "data/problem-14-a.txt"))))
+  (is (= 93 (answer-b "data/problem-14-a.txt"))))

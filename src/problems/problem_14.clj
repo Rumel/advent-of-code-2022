@@ -125,6 +125,12 @@
                    (nil? (get-in graph [:points [(+ x 1) (inc y)]]))
                    (recur (+ x 1) (inc y))
 
+                   (and (= x 500) (= y 0))
+                   (-> graph
+                       (update :sand-count inc)
+                       (assoc :finished true)
+                       (assoc-in [:points [x y]] "o"))
+
                    :else (-> graph
                              (update :sand-count inc)
                              (assoc-in [:points [x y]] "o"))))]
@@ -141,16 +147,36 @@
       graph
       (recur (drop-grain graph)))))
 
+(defn add-floor
+  [graph]
+  (let [y (graph :y2)
+        yfloor (+ 2 y)
+        x1 (- 500 yfloor)
+        x2 (+ 500 yfloor)]
+    (-> graph
+        (update-horizontal-bounds x1)
+        (update-horizontal-bounds x2)
+        (update-vertical-bounds yfloor)
+        (add-horizontal-line yfloor x1 x2))))
+
 (defn answer-a
   [file]
   (->> file
        parsed-input
        build-graph
        fill-with-sand
-       (print-board)
+      ;;  print-board
        :sand-count))
 
-(defn answer-b [file] "Not implemented yet")
+(defn answer-b
+  [file]
+  (->> file
+       parsed-input
+       build-graph
+       add-floor
+       fill-with-sand
+      ;;  print-board
+       :sand-count))
 
 (defn answer []
   (println "14: A:" (answer-a "data/problem-14-input.txt"))
