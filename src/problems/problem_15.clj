@@ -158,16 +158,16 @@
                             :sum sum}))
                        (range low high))
         missing (first (filter (fn [r]
-                                 (< (r :sum) high)) mapped-ranges))]
-    (let [ranges (missing :ranges)
-          index (missing :index)
-          result-f (fn [x]
-                     (+ index (* 4000000 x)))]
-      (cond
-        (= (count ranges) 2) (result-f (inc (second (first ranges))))
-        (= (count ranges) 1) (if (= low (ffirst ranges))
-                               high
-                               low)))))
+                                 (< (r :sum) high)) mapped-ranges))
+        ranges (missing :ranges)
+        index (missing :index)
+        result-f (fn [x]
+                   (+ index (* 4000000 x)))]
+    (cond
+      (= (count ranges) 2) (result-f (inc (second (first ranges))))
+      (= (count ranges) 1) (if (= low (ffirst ranges))
+                             high
+                             low))))
 
 (defn answer []
   ;; "Elapsed time: 27224.432958 msecs"
