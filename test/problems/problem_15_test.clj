@@ -7,4 +7,5 @@
       (= 4961647 (answer-a "data/problem-15-input.txt" 2000000))))
 
 (deftest answer-b-test
-  (is (= 0 (answer-b "data/problem-15-a.txt"))))
+  (is (= 56000011 (answer-b "data/problem-15-a.txt" 0 20)))
+  (is (= 12274327017867 (answer-b "data/problem-15-input.txt" 0 4000000))))

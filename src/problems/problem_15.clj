@@ -88,7 +88,7 @@
                      (if (nil? l)
                        (assoc d :ranges (conj ranges r))
                        (cond
-                         (and (<= x3 x2) (> x4 x2))
+                         (and (<= x3 (inc x2)) (> x4 x2))
                          (assoc d :ranges (conj (drop 1 ranges) [x1 x4]))
 
                          (> x3 x2)
@@ -98,13 +98,11 @@
                          d))))
                  {:ranges []}
                  sorted) :ranges)]
-    ranges))
+    (vec (reverse ranges))))
 
-(defn no-beacons
-  [sensors beacons line-num]
+(defn no-beacons-a
+  [sensors line-num]
   (let [ranges (map #(no-beacon-range % line-num) sensors)
-        ;; ranges (map #(set (range (first %) (second %))) ranges)
-        ;; ranges (reduce clojure.set/union ranges)
         ranges (merge-ranges ranges)
         c (reduce
            (fn
@@ -114,17 +112,62 @@
            ranges)]
     c))
 
+
 (defn answer-a
   [file line-num]
   (let [data (->> file
                   parse-input)
-        sensors (filter #(filter-sensor % line-num) (vals (data :sensors)))
-        beacons (data :beacons)]
-    (no-beacons sensors beacons line-num)))
+        sensors (filter #(filter-sensor % line-num) (vals (data :sensors)))]
+    (no-beacons-a sensors line-num)))
+
+(defn limit-ranges
+  [ranges low high]
+  (let [ranges ranges
+        f (fn [r]
+            (let [[x1 x2] r]
+              (cond
+                (> x1 high) nil
+                (< x2 low) nil
+                (and (> x2 high) (< x1 low)) [low high]
+                (< x1 low) [low x2]
+                (> x2 high) [x1 high]
+                :else r)))
+        ranges (map f ranges)
+        ranges (filter some? ranges)]
+    ranges))
+
+(defn no-beacons-b
+  [sensors line-num low high]
+  (let [ranges (map #(no-beacon-range % line-num) sensors)
+        ranges (merge-ranges ranges)
+        ranges (limit-ranges ranges low high)]
+    ranges))
 
 (defn answer-b
-  [file]
-  "Not implemented yet")
+  [file low high]
+  (let [data (->> file
+                  parse-input)
+        mapped-ranges (map
+                       (fn [line-num]
+                         (let [sensors (filter #(filter-sensor % line-num) (vals (data :sensors)))
+                               ranges (no-beacons-b sensors line-num low high)
+                               sum (reduce (fn [acc [x1 x2]]
+                                             (+ acc (- x2 x1))) 0 ranges)]
+                           {:index line-num
+                            :ranges ranges
+                            :sum sum}))
+                       (range low high))
+        missing (first (filter (fn [r]
+                                 (< (r :sum) high)) mapped-ranges))]
+    (let [ranges (missing :ranges)
+          index (missing :index)
+          result-f (fn [x]
+                     (+ index (* 4000000 x)))]
+      (cond
+        (= (count ranges) 2) (result-f (inc (second (first ranges))))
+        (= (count ranges) 1) (if (= low (ffirst ranges))
+                               high
+                               low)))))
 
 (defn answer []
   ;; "Elapsed time: 27224.432958 msecs"
@@ -145,4 +188,7 @@
   ;; "Elapsed time: 7.111083 msecs"
   (time
    (println "15: A:" (answer-a "data/problem-15-input.txt" 2000000)))
-  (println "15: B:" (answer-b "data/problem-15-input.txt")))
+
+  ;; "Elapsed time: 11782.155916 msecs"
+  (time
+   (println "15: B:" (answer-b "data/problem-15-input.txt" 0 4000000))))
