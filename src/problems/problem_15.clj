@@ -3,7 +3,6 @@
 
 (def data
   {:sensors {}
-   :beacons #{}
    :low-x ##Inf
    :high-x ##-Inf
    :low-y ##Inf
@@ -56,7 +55,6 @@
                 distance (manhattan-distance s-x s-y b-x b-y)
                 data (update-bounds data s-x s-y distance)]
             (-> data
-                (update :beacons conj [b-x b-y])
                 (assoc-in [:sensors [s-x s-y]] (create-sensor s-x s-y distance)))))
         data)))
 
@@ -77,88 +75,69 @@
     [low-x high-x]))
 
 (defn merge-ranges
-  [ranges]
-  (let [sorted (sort-by first ranges)
-        ranges ((reduce
-                 (fn
-                   [{:keys [ranges] :as d} r]
-                   (let [l (first ranges)
-                         [x1 x2] l
-                         [x3 x4] r]
-                     (if (nil? l)
-                       (assoc d :ranges (conj ranges r))
-                       (cond
-                         (and (<= x3 (inc x2)) (> x4 x2))
-                         (assoc d :ranges (conj (drop 1 ranges) [x1 x4]))
-
-                         (> x3 x2)
-                         (assoc d :ranges (conj ranges r))
-
-                         :else
-                         d))))
-                 {:ranges []}
-                 sorted) :ranges)]
-    (vec (reverse ranges))))
-
-(defn no-beacons-a
-  [sensors line-num]
-  (let [ranges (map #(no-beacon-range % line-num) sensors)
-        ranges (merge-ranges ranges)
-        c (reduce
-           (fn
-             [acc [x1 x2]]
-             (+ acc (- x2 x1)))
-           0
-           ranges)]
-    c))
-
+  [acc r]
+  (let [l (first acc)
+        [x1 x2] l
+        [x3 x4] r]
+    (if (nil? l)
+      (conj acc r)
+      (cond
+        (and (<= x3 (inc x2)) (> x4 x2)) (conj (drop 1 acc) [x1 x4])
+        (> x3 x2) (conj acc r)
+        :else acc))))
 
 (defn answer-a
   [file line-num]
   (let [data (->> file
-                  parse-input)
-        sensors (filter #(filter-sensor % line-num) (vals (data :sensors)))]
-    (no-beacons-a sensors line-num)))
+                  parse-input)]
+    (->> (vals (data :sensors))
+         (filter #(filter-sensor % line-num))
+         (map #(no-beacon-range % line-num))
+         (sort-by first)
+         (reduce merge-ranges [])
+         (reduce
+          (fn
+            [acc [x1 x2]]
+            (+ acc (- x2 x1)))
+          0))))
 
 (defn limit-ranges
-  [ranges low high]
-  (let [ranges ranges
-        f (fn [r]
-            (let [[x1 x2] r]
-              (cond
-                (> x1 high) nil
-                (< x2 low) nil
-                (and (> x2 high) (< x1 low)) [low high]
-                (< x1 low) [low x2]
-                (> x2 high) [x1 high]
-                :else r)))
-        ranges (map f ranges)
-        ranges (filter some? ranges)]
-    ranges))
+  [r low high]
+  (let [[x1 x2] r]
+    (cond
+      (> x1 high) nil
+      (< x2 low) nil
+      (and (> x2 high) (< x1 low)) [low high]
+      (< x1 low) [low x2]
+      (> x2 high) [x1 high]
+      :else r)))
 
-(defn no-beacons-b
+(defn map-ranges
   [sensors line-num low high]
-  (let [ranges (map #(no-beacon-range % line-num) sensors)
-        ranges (merge-ranges ranges)
-        ranges (limit-ranges ranges low high)]
-    ranges))
+  (let [ranges (->> sensors
+                    (filter #(filter-sensor % line-num))
+                    (map #(no-beacon-range % line-num))
+                    (sort-by first)
+                    (reduce merge-ranges [])
+                    reverse
+                    vec
+                    (map #(limit-ranges % low high))
+                    (filter some?))
+        sum (reduce (fn [acc [x1 x2]]
+                      (+ acc (- x2 x1))) 0 ranges)]
+    {:index line-num
+     :ranges ranges
+     :sum sum}))
 
 (defn answer-b
   [file low high]
   (let [data (->> file
                   parse-input)
-        mapped-ranges (map
-                       (fn [line-num]
-                         (let [sensors (filter #(filter-sensor % line-num) (vals (data :sensors)))
-                               ranges (no-beacons-b sensors line-num low high)
-                               sum (reduce (fn [acc [x1 x2]]
-                                             (+ acc (- x2 x1))) 0 ranges)]
-                           {:index line-num
-                            :ranges ranges
-                            :sum sum}))
-                       (range low high))
-        missing (first (filter (fn [r]
-                                 (< (r :sum) high)) mapped-ranges))
+        missing (->> (range low high)
+                     (map #(map-ranges (vals (data :sensors)) % low high))
+                     (filter (fn [r]
+                               (< (r :sum) high)))
+                     first)
         ranges (missing :ranges)
         index (missing :index)
         result-f (fn [x]
