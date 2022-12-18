@@ -3,7 +3,8 @@
             [problems.problem-18 :refer [answer-a answer-b]]))
 
 (deftest answer-a-test
-  (is (= (answer-a) "Not implemented yet")))
+  (is (= 64 (answer-a "data/problem-18-a.txt")))
+  (is (= 3364 (answer-a "data/problem-18-input.txt"))))
 
 (deftest answer-b-test
-  (is (= (answer-b) "Not implemented yet")))
+  (is (= 0 (answer-b "Not implemented yet"))))
