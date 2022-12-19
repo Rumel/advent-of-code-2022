@@ -1,7 +1,7 @@
 (ns problems.problem-18
-  (:require [clojure.string :as str]
-            [common.helpers :refer [debug input]]
-            [clojure.pprint :refer [pprint]]))
+  (:require [clojure.set :as set]
+            [clojure.string :as str]
+            [common.helpers :refer [debug input]]))
 
 (def lava {:points {}})
 
@@ -47,9 +47,58 @@
     ;; (pprint lava-graph)
     (reduce + (map #((second %) :visibility) (lava-graph :points)))))
 
+(defn max-distance
+  [graph]
+  (->> (get graph :points)
+       keys
+       flatten
+       (apply max)
+       inc))
+
+(defn min-distance
+  [graph]
+  (->> (get graph :points)
+       keys
+       flatten
+       (apply min)
+       dec))
+
+(defn visit-point
+  [graph point visited ff]
+  (let [points (adjacent-points point)
+        points (filter ff points)
+        unvisited-points (set (filter #(not (visited %)) points))
+        in-graph (set (filter #(get-in graph [:points %]) unvisited-points))]
+    [#{point} (count in-graph) (clojure.set/difference unvisited-points in-graph)]))
+
+(defn bfs
+  [graph point]
+  (let [max-d (max-distance graph)
+        min-d (min-distance graph)
+        filter-func (fn [[x y z]]
+                      (and (>= x min-d)
+                           (>= y min-d)
+                           (>= z min-d)
+                           (<= x max-d)
+                           (<= y max-d)
+                           (<= z max-d)))]
+    (loop [visited #{}
+           queue #{point}
+           total 0]
+      (if (empty? queue)
+        total
+        (let [[new-visited add-total add-queue] (visit-point graph (first queue) visited filter-func)]
+          (recur
+           (set/union visited new-visited)
+           (set/union (set (rest queue)) add-queue)
+           (+ total add-total)))))))
+
 (defn answer-b
   [file]
-  "Not implemented yet")
+  (let [lava-graph (->> file
+                        parse-input
+                        (build-lava lava))]
+    (bfs lava-graph [0 0 0])))
 
 (defn answer []
   (println "18: A:" (answer-a "data/problem-18-input.txt"))
