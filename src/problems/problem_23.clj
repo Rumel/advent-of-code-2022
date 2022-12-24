@@ -79,8 +79,9 @@
           :directions directions}
          elves)
         ;; _ (println "Non-moving: " non-moving-elves)
-        next-elves (reduce conj next-elves (zipmap non-moving-elves (cycle [true])))]
-    next-elves))
+        next-elves (reduce conj next-elves (zipmap non-moving-elves (cycle [true])))
+        no-movement (= (set (keys elves)) (set (keys next-elves)))]
+    [next-elves no-movement]))
 
 (defn answer-a
   [file]
@@ -89,7 +90,9 @@
         elves-count (count elves)
         final-elves (reduce
                      (fn [elves round]
-                       (execute-round elves round))
+                       (let [[elves _]
+                             (execute-round elves round)]
+                         elves))
                      elves
                      (range 0 10))
         elves-keys (keys final-elves)
@@ -106,12 +109,20 @@
     (println "Elves:" elves-count)
     (- area elves-count)))
 
-(answer-a "data/problem-23-a.txt")
-;; (answer-a "data/problem-23-b.txt")
-
 (defn answer-b
   [file]
-  "Not implemented yet")
+  (let [elves (-> file
+                  parse-input)
+        last-round (reduce
+                    (fn [elves round]
+                      (let [[elves no-movement]
+                            (execute-round elves round)]
+                        (if no-movement
+                          (reduced round)
+                          elves)))
+                    elves
+                    (iterate inc 0))]
+    (inc last-round)))
 
 (defn answer []
   (println "23: A:" (answer-a "data/problem-23-input.txt"))

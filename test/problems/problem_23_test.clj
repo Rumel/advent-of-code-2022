@@ -7,4 +7,5 @@
   (is (= 4181 (answer-a "data/problem-23-input.txt"))))
 
 (deftest answer-b-test
-  (is (= "Not implemented yet" (answer-b "Not implemented yet"))))
+  (is (= 20 (answer-b "data/problem-23-a.txt")))
+  (is (= 973 (answer-b "data/problem-23-input.txt"))))
